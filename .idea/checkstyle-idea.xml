@@ -4,14 +4,11 @@
     <checkstyleVersion>12.3.1</checkstyleVersion>
     <scanScope>JavaOnly</scanScope>
     <option name="thirdPartyClasspath" />
-    <option name="activeLocationIds">
-      <option value="7aff6287-5035-469d-afda-ef1db2806e41" />
-    </option>
+    <option name="activeLocationIds" />
     <option name="locations">
       <list>
         <ConfigurationLocation id="bundled-sun-checks" type="BUNDLED" scope="All" description="Sun Checks">(bundled)</ConfigurationLocation>
         <ConfigurationLocation id="bundled-google-checks" type="BUNDLED" scope="All" description="Google Checks">(bundled)</ConfigurationLocation>
-        <ConfigurationLocation id="7aff6287-5035-469d-afda-ef1db2806e41" type="HTTP_URL" scope="All" description="Otus">https://raw.githubusercontent.com/OtusTeam/Spring/master/checkstyle.xml</ConfigurationLocation>
       </list>
     </option>
   </component>
