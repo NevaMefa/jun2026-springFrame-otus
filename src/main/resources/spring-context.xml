@@ -20,13 +20,17 @@
         </constructor-arg>
     </bean>
 
+    <bean id="questionConverter" class="ru.otus.hw.service.QuestionConverter"/>
+
     <bean id="testService" class="ru.otus.hw.service.TestServiceImpl">
         <constructor-arg ref="ioService"/>
         <constructor-arg ref="questionDao"/>
+        <constructor-arg ref="questionConverter"/>
     </bean>
 
     <bean id="testRunnerService" class="ru.otus.hw.service.TestRunnerServiceImpl">
         <constructor-arg ref="testService"/>
+        <constructor-arg ref="ioService"/>
     </bean>
 
 </beans>
