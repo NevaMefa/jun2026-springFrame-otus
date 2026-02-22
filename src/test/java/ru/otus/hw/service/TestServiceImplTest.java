@@ -38,7 +38,6 @@ class TestServiceImplTest {
 
     @Test
     void executeTest_ShouldNotThrowExceptions() {
-        // Given
         List<Question> questions = Arrays.asList(
                 new Question("Question 1", Arrays.asList(
                         new Answer("Answer 1-1", true),
@@ -50,7 +49,6 @@ class TestServiceImplTest {
         when(questionConverter.convertQuestionToString(any(Question.class), anyInt()))
                 .thenReturn("Question 1: Question 1\n  1) Answer 1-1\n  2) Answer 1-2");
 
-        // When & Then
         assertDoesNotThrow(() -> testService.executeTest());
     }
 }

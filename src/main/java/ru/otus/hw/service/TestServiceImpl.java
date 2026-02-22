@@ -23,7 +23,7 @@ public class TestServiceImpl implements TestService {
         for (int i = 0; i < questions.size(); i++) {
             String questionString = questionConverter.convertQuestionToString(questions.get(i), i + 1);
             ioService.printLine(questionString);
-            ioService.printLine(""); // пустая строка между вопросами
+            ioService.printLine("");
         }
     }
 }

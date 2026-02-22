@@ -14,10 +14,8 @@ public class QuestionConverter {
     public String convertQuestionToString(Question question, int questionNumber) {
         StringBuilder sb = new StringBuilder();
 
-        // Добавляем вопрос
         sb.append(String.format("Question %d: %s%n", questionNumber, question.text()));
 
-        // Добавляем варианты ответов
         List<Answer> answers = question.answers();
         String answersString = IntStream.range(0, answers.size())
                 .mapToObj(j -> String.format("  %d) %s", j + 1, answers.get(j).text()))
