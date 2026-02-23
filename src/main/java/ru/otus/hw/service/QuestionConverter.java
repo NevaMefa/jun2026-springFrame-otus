@@ -2,26 +2,21 @@ package ru.otus.hw.service;
 
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@Component
 public class QuestionConverter {
 
     public String convertQuestionToString(Question question, int questionNumber) {
         StringBuilder sb = new StringBuilder();
-
         sb.append(String.format("Question %d: %s%n", questionNumber, question.text()));
 
         List<Answer> answers = question.answers();
-        String answersString = IntStream.range(0, answers.size())
-                .mapToObj(j -> String.format("  %d) %s", j + 1, answers.get(j).text()))
-                .collect(Collectors.joining("%n"));
-
-        sb.append(answersString);
+        for (int j = 0; j < answers.size(); j++) {
+            sb.append(String.format("  %d) %s%n", j + 1, answers.get(j).text()));
+        }
 
         return sb.toString();
     }
