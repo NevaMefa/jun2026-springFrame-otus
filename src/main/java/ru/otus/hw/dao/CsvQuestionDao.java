@@ -28,7 +28,7 @@ public class CsvQuestionDao implements QuestionDao {
             List<QuestionDto> questionDtos = new CsvToBeanBuilder<QuestionDto>(
                     new InputStreamReader(inputStream))
                     .withType(QuestionDto.class)
-                    .withSkipLines(1)
+                    .withSkipLines(2)
                     .withSeparator(';')
                     .build()
                     .parse();
