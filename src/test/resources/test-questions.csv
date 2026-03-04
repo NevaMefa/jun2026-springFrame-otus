@@ -1,0 +1,4 @@
+#Тестовые вопросы для будущих интеграционных тестов
+#Сейчас не используется, используют мок
+Test question 1;Answer 1%true|Answer 2%false|Answer 3%false
+Test question 2;Answer A%false|Answer B%true|Answer C%false
