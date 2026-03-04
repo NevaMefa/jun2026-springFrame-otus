@@ -1,4 +1,4 @@
-package ru.otus.hw.service;
+package ru.otus.hw;
 
 import lombok.RequiredArgsConstructor;
 import ru.otus.hw.exceptions.QuestionReadException;
