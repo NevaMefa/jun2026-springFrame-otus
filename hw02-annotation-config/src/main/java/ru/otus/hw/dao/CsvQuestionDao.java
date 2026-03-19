@@ -29,7 +29,7 @@ public class CsvQuestionDao implements QuestionDao {
                 .getResourceAsStream(fileNameProvider.getTestFileName());
 
         if (inputStream == null) {
-            throw new QuestionReadException("File not found: " + fileNameProvider.getTestFileName());
+            throw new QuestionReadException("Resource not found: " + fileNameProvider.getTestFileName());
         }
 
         try (InputStream is = inputStream;
@@ -38,7 +38,7 @@ public class CsvQuestionDao implements QuestionDao {
             CsvToBean<QuestionDto> csvToBean = new CsvToBeanBuilder<QuestionDto>(reader)
                     .withType(QuestionDto.class)
                     .withSeparator(';')
-                    .withSkipLines(1)
+                    .withSkipLines(2)
                     .build();
 
             return csvToBean.parse().stream()
