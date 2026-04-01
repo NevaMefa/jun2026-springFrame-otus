@@ -14,7 +14,7 @@ public class TestRunnerServiceImpl implements TestRunnerService {
 
     private final ResultService resultService;
 
-    private final IOService ioService;
+    private final LocalizedIOService ioService;
 
     @Override
     public void run() {
@@ -23,9 +23,9 @@ public class TestRunnerServiceImpl implements TestRunnerService {
             var testResult = testService.executeTestFor(student);
             resultService.showResult(testResult);
         } catch (QuestionReadException e) {
-            ioService.printLine("Error: Failed to load test data. Please try again later.");
+            ioService.printLineLocalized("TestRunnerService.error.loading");
         } catch (Exception e) {
-            ioService.printLine("Error: An unexpected error occurred while running the test. Please try again later.");
+            ioService.printLineLocalized("TestRunnerService.error.unexpected");
         }
     }
 }
