@@ -14,5 +14,6 @@
         <module>hw01xml-config</module>
         <module>hw02-annotation-config</module>
         <module>hw03-spring-boot</module>
+        <module>hw05-jdbcBiblioteka</module>
     </modules>
 </project>
