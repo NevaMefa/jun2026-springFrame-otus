@@ -1,9 +1,12 @@
 package ru.otus.hw.dao;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
@@ -13,18 +16,27 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest(properties = "spring.shell.interactive.enabled=false")
 @DisplayName("Класс CsvQuestionDao")
 class CsvQuestionDaoTest {
 
+    // Мок TestFileNameProvider (определён в TestConfiguration)
+    @Autowired
     private TestFileNameProvider fileNameProvider;
+
+    @Autowired
     private CsvQuestionDao csvQuestionDao;
 
-    @BeforeEach
-    void setUp() {
-        fileNameProvider = Mockito.mock(TestFileNameProvider.class);
-        csvQuestionDao = new CsvQuestionDao(fileNameProvider);
+    @TestConfiguration
+    static class MockConfig {
+        @Bean
+        @Primary
+        public TestFileNameProvider mockTestFileNameProvider() {
+            return mock(TestFileNameProvider.class);
+        }
     }
 
     @Test
@@ -114,11 +126,10 @@ class CsvQuestionDaoTest {
     @Test
     @DisplayName("Должен бросать исключение при попытке чтения несуществующего CSV файла")
     void shouldThrowExceptionWhenCsvFileNotFound() {
-        String nonExistentFileName = "non-existent-file.csv";
-        when(fileNameProvider.getTestFileName()).thenReturn(nonExistentFileName);
+        when(fileNameProvider.getTestFileName()).thenReturn("non-existent-file.csv");
 
         assertThatThrownBy(() -> csvQuestionDao.findAll())
                 .isInstanceOf(QuestionReadException.class)
-                .hasMessageContaining("File not found: " + nonExistentFileName);
+                .hasMessageContaining("File not found: non-existent-file.csv");
     }
 }
