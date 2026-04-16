@@ -23,7 +23,6 @@ import static org.mockito.Mockito.when;
 @DisplayName("Класс CsvQuestionDao")
 class CsvQuestionDaoTest {
 
-    // Мок TestFileNameProvider (определён в TestConfiguration)
     @Autowired
     private TestFileNameProvider fileNameProvider;
 
