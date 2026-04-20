@@ -1,8 +1,10 @@
 package ru.otus.hw.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.otus.hw.dao.QuestionDao;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
@@ -17,25 +19,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest(classes = TestServiceImpl.class)
 @DisplayName("Тест сервиса тестирования")
 class TestServiceImplTest {
 
+    @MockitoBean
     private LocalizedIOService ioService;
-    private QuestionDao questionDao;
-    private TestServiceImpl testService;
-    private Student student;
 
-    @BeforeEach
-    void setUp() {
-        ioService = mock(LocalizedIOService.class);
-        questionDao = mock(QuestionDao.class);
-        testService = new TestServiceImpl(ioService, questionDao);
-        student = new Student("Ivan", "Ivanov");
-    }
+    @MockitoBean
+    private QuestionDao questionDao;
+
+    @Autowired
+    private TestServiceImpl testService;
 
     @Test
     @DisplayName("Должен вывести все вопросы и варианты ответов")
     void shouldPrintAllQuestionsAndAnswers() {
+        Student student = new Student("Ivan", "Ivanov");
         List<Question> testQuestions = Arrays.asList(
                 new Question("What is 2+2?", Arrays.asList(
                         new Answer("3", false),
@@ -55,11 +55,7 @@ class TestServiceImplTest {
         verify(ioService, times(1)).printFormattedLine("%d. %s", 3, "5");
 
         verify(ioService, times(1)).readIntForRangeLocalized(
-                eq(1),
-                eq(3),
-                eq("TestService.error.message"),
-                eq(1),
-                eq(3));
+                eq(1), eq(3), eq("TestService.error.message"), eq(1), eq(3));
 
         assertThat(result.getAnsweredQuestions()).hasSize(1);
         assertThat(result.getRightAnswersCount()).isEqualTo(1);
@@ -68,6 +64,7 @@ class TestServiceImplTest {
     @Test
     @DisplayName("Должен корректно обрабатывать неправильные ответы")
     void shouldHandleWrongAnswers() {
+        Student student = new Student("Ivan", "Ivanov");
         List<Question> testQuestions = Arrays.asList(
                 new Question("What is 2+2?", Arrays.asList(
                         new Answer("3", false),
@@ -81,11 +78,7 @@ class TestServiceImplTest {
         TestResult result = testService.executeTestFor(student);
 
         verify(ioService, times(1)).readIntForRangeLocalized(
-                eq(1),
-                eq(3),
-                eq("TestService.error.message"),
-                eq(1),
-                eq(3));
+                eq(1), eq(3), eq("TestService.error.message"), eq(1), eq(3));
 
         assertThat(result.getAnsweredQuestions()).hasSize(1);
         assertThat(result.getRightAnswersCount()).isEqualTo(0);
@@ -94,6 +87,7 @@ class TestServiceImplTest {
     @Test
     @DisplayName("Должен обрабатывать пустой список вопросов")
     void shouldHandleEmptyQuestionsList() {
+        Student student = new Student("Ivan", "Ivanov");
         when(questionDao.findAll()).thenReturn(Collections.emptyList());
 
         TestResult result = testService.executeTestFor(student);
@@ -103,7 +97,6 @@ class TestServiceImplTest {
 
         verify(ioService, never()).printLine(argThat(s -> !s.isEmpty()));
         verify(ioService, never()).printFormattedLine(eq("%d. %s"), anyInt(), anyString());
-
         verify(ioService, never()).readIntForRangeLocalized(anyInt(), anyInt(), anyString(), anyInt(), anyInt());
 
         assertThat(result.getAnsweredQuestions()).isEmpty();

@@ -4,9 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import ru.otus.hw.config.TestFileNameProvider;
 import ru.otus.hw.domain.Answer;
 import ru.otus.hw.domain.Question;
@@ -16,27 +14,17 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(properties = "spring.shell.interactive.enabled=false")
+@SpringBootTest(classes = CsvQuestionDao.class)
 @DisplayName("Класс CsvQuestionDao")
 class CsvQuestionDaoTest {
 
-    @Autowired
+    @MockitoBean
     private TestFileNameProvider fileNameProvider;
 
     @Autowired
     private CsvQuestionDao csvQuestionDao;
-
-    @TestConfiguration
-    static class MockConfig {
-        @Bean
-        @Primary
-        public TestFileNameProvider mockTestFileNameProvider() {
-            return mock(TestFileNameProvider.class);
-        }
-    }
 
     @Test
     @DisplayName("Должен корректно читать вопросы из существующего CSV файла")
@@ -125,10 +113,11 @@ class CsvQuestionDaoTest {
     @Test
     @DisplayName("Должен бросать исключение при попытке чтения несуществующего CSV файла")
     void shouldThrowExceptionWhenCsvFileNotFound() {
-        when(fileNameProvider.getTestFileName()).thenReturn("non-existent-file.csv");
+        String nonExistentFileName = "non-existent-file.csv";
+        when(fileNameProvider.getTestFileName()).thenReturn(nonExistentFileName);
 
         assertThatThrownBy(() -> csvQuestionDao.findAll())
                 .isInstanceOf(QuestionReadException.class)
-                .hasMessageContaining("File not found: non-existent-file.csv");
+                .hasMessageContaining("File not found: " + nonExistentFileName);
     }
 }
