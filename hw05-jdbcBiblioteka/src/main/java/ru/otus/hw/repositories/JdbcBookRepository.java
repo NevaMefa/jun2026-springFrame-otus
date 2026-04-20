@@ -40,9 +40,9 @@ public class JdbcBookRepository implements BookRepository {
                     g.id as genre_id,
                     g.name as genre_name
                 from books b
-                join authors a on a.id = b.author_id
-                left join books_genres bg on bg.book_id = b.id
-                left join genres g on g.id = bg.genre_id
+                    left join authors a on a.id = b.author_id
+                    left join books_genres bg on bg.book_id = b.id
+                    left join genres g on g.id = bg.genre_id
                 where b.id = :id
                 order by g.id
                 """;

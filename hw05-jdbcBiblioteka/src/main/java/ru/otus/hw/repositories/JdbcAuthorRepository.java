@@ -28,7 +28,7 @@ public class JdbcAuthorRepository implements AuthorRepository {
         var sql = """
                 select id, full_name
                 from authors
-                where id = :id limit 1
+                where id = :id
                 """;
         
         return namedJdbc.query(sql, Map.of("id", id), new AuthorRowMapper())
