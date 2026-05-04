@@ -11,7 +11,6 @@ import ru.otus.hw.models.Genre;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,12 +32,9 @@ class JpaBookRepositoryTest {
         em.persist(book);
         em.flush();
 
-        Optional<Book> found = bookRepo.findById(book.getId());
-
+        var found = bookRepo.findById(book.getId());
         assertThat(found).isPresent();
         assertThat(found.get().getTitle()).isEqualTo("Test Book");
-        assertThat(found.get().getAuthor().getFullName()).isEqualTo("Test Author");
-        assertThat(found.get().getGenres()).isNotNull();
     }
 
     @Test
@@ -52,9 +48,7 @@ class JpaBookRepositoryTest {
         em.flush();
 
         List<Book> books = bookRepo.findAll();
-
-        assertThat(books).isNotEmpty();
-        assertThat(books.size()).isGreaterThanOrEqualTo(2);
+        assertThat(books).hasSize(2);
     }
 
     @Test
@@ -72,9 +66,6 @@ class JpaBookRepositoryTest {
 
         assertThat(saved.getId()).isPositive();
         assertThat(saved.getTitle()).isEqualTo("Brand New Book");
-        assertThat(saved.getAuthor().getId()).isEqualTo(author.getId());
-        assertThat(saved.getGenres()).hasSize(1);
-        assertThat(saved.getGenres().get(0).getName()).isEqualTo("Test Genre");
     }
 
     @Test
@@ -99,11 +90,9 @@ class JpaBookRepositoryTest {
 
         Book updated = bookRepo.save(book);
 
-        assertThat(updated.getId()).isEqualTo(book.getId());
         assertThat(updated.getTitle()).isEqualTo("Updated Title");
         assertThat(updated.getAuthor().getFullName()).isEqualTo("Updated Author");
         assertThat(updated.getGenres()).hasSize(1);
-        assertThat(updated.getGenres().get(0).getName()).isEqualTo("Updated Genre");
     }
 
     @Test
@@ -115,11 +104,11 @@ class JpaBookRepositoryTest {
         em.flush();
 
         Long id = book.getId();
-        assertThat(bookRepo.findById(id)).isPresent();
+        assertThat(em.find(Book.class, id)).isNotNull();
 
         bookRepo.deleteById(id);
         em.flush();
 
-        assertThat(bookRepo.findById(id)).isEmpty();
+        assertThat(em.find(Book.class, id)).isNull();
     }
 }

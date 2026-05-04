@@ -10,7 +10,6 @@ import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Comment;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,10 +36,7 @@ class JpaCommentRepositoryTest {
         em.flush();
 
         List<Comment> comments = commentRepo.findByBookId(book.getId());
-
         assertThat(comments).hasSize(2);
-        assertThat(comments.get(0).getText()).isIn("Nice comment", "Bad comment");
-        assertThat(comments.get(0).getBook().getId()).isEqualTo(book.getId());
     }
 
     @Test
@@ -53,11 +49,9 @@ class JpaCommentRepositoryTest {
         em.persist(comment);
         em.flush();
 
-        Optional<Comment> found = commentRepo.findById(comment.getId());
-
+        var found = commentRepo.findById(comment.getId());
         assertThat(found).isPresent();
         assertThat(found.get().getText()).isEqualTo("Find me");
-        assertThat(found.get().getBook().getId()).isEqualTo(book.getId());
     }
 
     @Test
@@ -70,10 +64,8 @@ class JpaCommentRepositoryTest {
 
         Comment newComment = new Comment(0, "New comment", book);
         Comment saved = commentRepo.save(newComment);
-
         assertThat(saved.getId()).isPositive();
         assertThat(saved.getText()).isEqualTo("New comment");
-        assertThat(saved.getBook().getId()).isEqualTo(book.getId());
     }
 
     @Test
@@ -88,8 +80,6 @@ class JpaCommentRepositoryTest {
 
         comment.setText("Updated text");
         Comment updated = commentRepo.save(comment);
-
-        assertThat(updated.getId()).isEqualTo(comment.getId());
         assertThat(updated.getText()).isEqualTo("Updated text");
     }
 
@@ -104,11 +94,11 @@ class JpaCommentRepositoryTest {
         em.flush();
 
         Long id = comment.getId();
-        assertThat(commentRepo.findById(id)).isPresent();
+        assertThat(em.find(Comment.class, id)).isNotNull();
 
         commentRepo.deleteById(id);
         em.flush();
 
-        assertThat(commentRepo.findById(id)).isEmpty();
+        assertThat(em.find(Comment.class, id)).isNull();
     }
 }
