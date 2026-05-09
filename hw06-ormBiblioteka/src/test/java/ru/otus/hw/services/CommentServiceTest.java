@@ -18,12 +18,30 @@ class CommentServiceTest {
     private CommentService commentService;
 
     @Test
-    void shouldNotThrowLazyExceptionWhenAccessingBookFromComment() {
+    void shouldNotThrowLazyExceptionWhenFindById() {
+        var comment = commentService.findById(1L).orElseThrow();
+        assertDoesNotThrow(() -> comment.getBook().getTitle());
+    }
+
+    @Test
+    void shouldNotThrowLazyExceptionWhenFindByBookId() {
         var comments = commentService.findByBookId(1L);
         assertDoesNotThrow(() -> {
             for (var comment : comments) {
                 comment.getBook().getTitle();
             }
         });
+    }
+
+    @Test
+    void shouldNotThrowLazyExceptionWhenInsert() {
+        var comment = commentService.insert("Test comment", 1L);
+        assertDoesNotThrow(() -> comment.getBook().getTitle());
+    }
+
+    @Test
+    void shouldNotThrowLazyExceptionWhenUpdate() {
+        var comment = commentService.update(1L, "Updated comment");
+        assertDoesNotThrow(() -> comment.getBook().getTitle());
     }
 }
