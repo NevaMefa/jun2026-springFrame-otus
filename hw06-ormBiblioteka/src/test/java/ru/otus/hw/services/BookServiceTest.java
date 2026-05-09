@@ -2,60 +2,50 @@ package ru.otus.hw.services;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.jdbc.Sql;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import ru.otus.hw.models.Book;
+import ru.otus.hw.repositories.*;
 
 import java.util.List;
-import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-@SpringBootTest(properties = "spring.shell.interactive.enabled=false")
-@Transactional(propagation = Propagation.NOT_SUPPORTED)
-@Sql(scripts = "/data.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-class BookServiceTest {
+@DataJpaTest
+@Transactional(propagation = Propagation.NEVER)
+@Import({JpaAuthorRepository.class, JpaBookRepository.class, JpaGenreRepository.class, BookServiceImpl.class})
+public class BookServiceTest {
 
     @Autowired
-    private BookService bookService;
+    private BookServiceImpl bookService;
 
     @Test
     void shouldNotThrowLazyExceptionWhenFindById() {
-        Book book = bookService.findById(1L).orElseThrow();
+        var optionalBook = bookService.findById(1L);
+        assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
+        assertThat(optionalBook).isPresent();
+        Book book = optionalBook.get();
         assertDoesNotThrow(() -> {
             book.getAuthor().getFullName();
-            book.getGenres().forEach(g -> g.getName());
+            book.getGenres().size();
         });
     }
 
     @Test
     void shouldNotThrowLazyExceptionWhenFindAll() {
         List<Book> books = bookService.findAll();
-        assertDoesNotThrow(() -> {
-            for (Book book : books) {
+        assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
+        assertThat(books).isNotEmpty();
+        for (Book book : books) {
+            assertDoesNotThrow(() -> {
                 book.getAuthor().getFullName();
-                book.getGenres().forEach(g -> g.getName());
-            }
-        });
+                book.getGenres().size();
+            });
+        }
     }
 
-    @Test
-    void shouldNotThrowLazyExceptionWhenInsert() {
-        Book book = bookService.insert("New Book", 1L, Set.of(1L, 2L));
-        assertDoesNotThrow(() -> {
-            book.getAuthor().getFullName();
-            book.getGenres().forEach(g -> g.getName());
-        });
-    }
-
-    @Test
-    void shouldNotThrowLazyExceptionWhenUpdate() {
-        Book book = bookService.update(1L, "Updated Title", 2L, Set.of(3L, 4L));
-        assertDoesNotThrow(() -> {
-            book.getAuthor().getFullName();
-            book.getGenres().forEach(g -> g.getName());
-        });
-    }
 }

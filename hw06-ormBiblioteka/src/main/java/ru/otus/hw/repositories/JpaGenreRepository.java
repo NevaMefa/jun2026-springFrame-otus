@@ -2,22 +2,22 @@ package ru.otus.hw.repositories;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import ru.otus.hw.models.Genre;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
-@RequiredArgsConstructor
 public class JpaGenreRepository implements GenreRepository {
+
     @PersistenceContext
-    private final EntityManager em;
+    private EntityManager em;
 
     @Override
     public List<Genre> findAll() {
-        return em.createQuery("select g from Genre g", Genre.class).getResultList();
+        return em.createQuery("SELECT g FROM Genre g", Genre.class).getResultList();
     }
 
     @Override
@@ -25,8 +25,28 @@ public class JpaGenreRepository implements GenreRepository {
         if (ids == null || ids.isEmpty()) {
             return List.of();
         }
-        return em.createQuery("select g from Genre g where g.id in :ids", Genre.class)
+        return em.createQuery("SELECT g FROM Genre g WHERE g.id IN :ids", Genre.class)
                 .setParameter("ids", ids)
                 .getResultList();
+    }
+
+    @Override
+    public Optional<Genre> findById(long id) {
+        return Optional.ofNullable(em.find(Genre.class, id));
+    }
+
+    @Override
+    public Genre save(Genre genre) {
+        if (genre.getId() == 0) {
+            em.persist(genre);
+            return genre;
+        } else {
+            return em.merge(genre);
+        }
+    }
+
+    @Override
+    public void deleteById(long id) {
+        findById(id).ifPresent(em::remove);
     }
 }

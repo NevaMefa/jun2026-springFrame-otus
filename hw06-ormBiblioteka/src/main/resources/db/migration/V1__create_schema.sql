@@ -25,7 +25,7 @@ create table if not exists books_genres (
 
 create table if not exists comments (
     id bigserial,
-    text varchar(255),
     book_id bigint references books(id) on delete cascade,
+    text varchar(1024),
     primary key (id)
 );

@@ -1,6 +1,5 @@
 package ru.otus.hw.services;
 
-import org.hibernate.Hibernate;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,7 @@ public class BookServiceImpl implements BookService {
     @Transactional(readOnly = true)
     public List<Book> findAll() {
         List<Book> books = bookRepository.findAll();
-        books.forEach(book -> Hibernate.initialize(book.getGenres()));
+        books.forEach(book -> book.getGenres().size());
         return books;
     }
 
