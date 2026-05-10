@@ -1,5 +1,6 @@
 package ru.otus.hw.repositories;
 
+import org.hibernate.Hibernate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -59,6 +60,27 @@ class JpaBookRepositoryTest {
 
         assertThat(saved.getId()).isPositive();
         assertThat(saved.getTitle()).isEqualTo("Brand New Book");
+        assertThat(saved.getGenres()).hasSize(1);
+        assertThat(saved.getGenres().get(0).getName()).isEqualTo("Test Genre");
+    }
+
+    @Test
+    void shouldSaveBookWithMultipleGenres() {
+        Author author = new Author(0, "Author");
+        em.persist(author);
+        Genre genre1 = new Genre(0, "Genre A");
+        Genre genre2 = new Genre(0, "Genre B");
+        em.persist(genre1);
+        em.persist(genre2);
+        em.flush();
+
+        Book book = new Book(0, "Multi-Genre Book", author, List.of(genre1, genre2));
+        Book saved = bookRepo.save(book);
+
+        assertThat(saved.getId()).isPositive();
+        assertThat(saved.getGenres()).hasSize(2);
+        assertThat(saved.getGenres()).extracting(Genre::getName)
+                .containsExactlyInAnyOrder("Genre A", "Genre B");
     }
 
     @Test
@@ -86,6 +108,28 @@ class JpaBookRepositoryTest {
         assertThat(updated.getTitle()).isEqualTo("Updated Title");
         assertThat(updated.getAuthor().getFullName()).isEqualTo("Updated Author");
         assertThat(updated.getGenres()).hasSize(1);
+        assertThat(updated.getGenres().get(0).getName()).isEqualTo("Updated Genre");
+    }
+
+    @Test
+    void shouldUpdateBookGenres() {
+        Author author = new Author(0, "Author");
+        em.persist(author);
+        Genre oldGenre = new Genre(0, "Old Genre");
+        Genre newGenre = new Genre(0, "New Genre");
+        em.persist(oldGenre);
+        em.persist(newGenre);
+        em.flush();
+
+        Book book = new Book(0, "Book", author, new ArrayList<>(List.of(oldGenre)));
+        em.persist(book);
+        em.flush();
+
+        book.setGenres(new ArrayList<>(List.of(newGenre)));
+        Book updated = bookRepo.save(book);
+
+        assertThat(updated.getGenres()).hasSize(1);
+        assertThat(updated.getGenres().get(0).getName()).isEqualTo("New Genre");
     }
 
     @Test
@@ -102,5 +146,42 @@ class JpaBookRepositoryTest {
         bookRepo.deleteById(id);
         em.flush();
         assertThat(em.find(Book.class, id)).isNull();
+    }
+
+    @Test
+    void shouldLoadGenresLazilyWhenNoEntityGraph() {
+        Author author = new Author(0, "Author");
+        em.persist(author);
+        Genre genre = new Genre(0, "Genre");
+        em.persist(genre);
+        Book book = new Book(0, "Book", author, List.of(genre));
+        em.persist(book);
+        em.flush();
+        em.clear();
+
+        Book found = em.find(Book.class, book.getId());
+        assertThat(Hibernate.isInitialized(found.getGenres())).isFalse();
+    }
+
+    @Test
+    void shouldLoadAuthorAndGenresWhenUsingEntityGraphFindById() {
+        Author author = new Author(0, "Author");
+        em.persist(author);
+        Genre genre1 = new Genre(0, "Genre1");
+        Genre genre2 = new Genre(0, "Genre2");
+        em.persist(genre1);
+        em.persist(genre2);
+        Book book = new Book(0, "Book", author, List.of(genre1, genre2));
+        em.persist(book);
+        em.flush();
+        em.clear();
+
+        var foundOpt = bookRepo.findById(book.getId());
+        assertThat(foundOpt).isPresent();
+        Book found = foundOpt.get();
+
+        assertThat(Hibernate.isInitialized(found.getAuthor())).isTrue();
+        assertThat(Hibernate.isInitialized(found.getGenres())).isTrue();
+        assertThat(found.getGenres()).hasSize(2);
     }
 }
