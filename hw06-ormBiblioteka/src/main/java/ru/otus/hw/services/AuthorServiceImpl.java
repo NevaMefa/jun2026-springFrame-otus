@@ -3,11 +3,15 @@ package ru.otus.hw.services;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
+import ru.otus.hw.mappers.AuthorMapper;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.repositories.AuthorRepository;
+
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -15,32 +19,38 @@ public class AuthorServiceImpl implements AuthorService {
 
     private final AuthorRepository authorRepository;
 
+    private final AuthorMapper authorMapper;
+
     @Override
     @Transactional(readOnly = true)
-    public List<Author> findAll() {
-        return authorRepository.findAll();
+    public List<AuthorDto> findAll() {
+        return authorRepository.findAll().stream()
+                .map(authorMapper::toDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<Author> findById(long id) {
-        return authorRepository.findById(id);
+    public Optional<AuthorDto> findById(long id) {
+        return authorRepository.findById(id).map(authorMapper::toDto);
     }
 
     @Override
     @Transactional
-    public Author insert(String fullName) {
+    public AuthorDto insert(String fullName) {
         Author author = new Author(0, fullName);
-        return authorRepository.save(author);
+        Author saved = authorRepository.save(author);
+        return authorMapper.toDto(saved);
     }
 
     @Override
     @Transactional
-    public Author update(long id, String fullName) {
+    public AuthorDto update(long id, String fullName) {
         Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Author with id %d not found".formatted(id)));
         author.setFullName(fullName);
-        return authorRepository.save(author);
+        Author updated = authorRepository.save(author);
+        return authorMapper.toDto(updated);
     }
 
     @Override

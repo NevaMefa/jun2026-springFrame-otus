@@ -4,43 +4,50 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
-import ru.otus.hw.models.Comment;
-import ru.otus.hw.repositories.BookRepository;
-import ru.otus.hw.repositories.CommentRepository;
-import ru.otus.hw.repositories.JpaBookRepository;
-import ru.otus.hw.repositories.JpaCommentRepository;
+import ru.otus.hw.dto.CommentDto;
+import ru.otus.hw.mappers.CommentMapper;
+import ru.otus.hw.repositories.*;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @DataJpaTest
-@Transactional(propagation = Propagation.NEVER)
-@Import({JpaBookRepository.class, JpaCommentRepository.class, CommentServiceImpl.class})
+@Import({JpaBookRepository.class, JpaCommentRepository.class, CommentMapper.class, CommentServiceImpl.class})
 public class CommentServiceTest {
 
     @Autowired
-    private CommentServiceImpl commentService;
+    private CommentService commentService;
 
     @Test
-    void shouldNotThrowLazyExceptionWhenFindById() {
+    void shouldFindById() {
         var optionalComment = commentService.findById(1L);
-        assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
         assertThat(optionalComment).isPresent();
-        assertDoesNotThrow(() -> optionalComment.get().getBook().getTitle());
+        CommentDto comment = optionalComment.get();
+        assertThat(comment.getId()).isEqualTo(1L);
+        assertThat(comment.getBookId()).isPositive();
     }
 
     @Test
-    void shouldNotThrowLazyExceptionWhenFindByBookId() {
-        List<Comment> comments = commentService.findByBookId(1L);
-        assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
+    void shouldFindByBookId() {
+        List<CommentDto> comments = commentService.findByBookId(1L);
         assertThat(comments).isNotEmpty();
-        for (Comment comment : comments) {
-            assertDoesNotThrow(() -> comment.getBook().getTitle());
+        for (CommentDto comment : comments) {
+            assertThat(comment.getBookId()).isEqualTo(1L);
         }
+    }
+
+    @Test
+    void shouldInsert() {
+        CommentDto newComment = commentService.insert("Test comment", 1L);
+        assertThat(newComment.getId()).isPositive();
+        assertThat(newComment.getText()).isEqualTo("Test comment");
+        assertThat(newComment.getBookId()).isEqualTo(1L);
+    }
+
+    @Test
+    void shouldUpdate() {
+        CommentDto updated = commentService.update(1L, "Updated comment");
+        assertThat(updated.getText()).isEqualTo("Updated comment");
     }
 }

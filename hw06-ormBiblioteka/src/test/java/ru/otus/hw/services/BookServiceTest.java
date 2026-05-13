@@ -4,48 +4,56 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
-import ru.otus.hw.models.Book;
+import ru.otus.hw.dto.BookDto;
+import ru.otus.hw.mappers.BookMapper;
 import ru.otus.hw.repositories.*;
 
 import java.util.List;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @DataJpaTest
-@Transactional(propagation = Propagation.NEVER)
-@Import({JpaAuthorRepository.class, JpaBookRepository.class, JpaGenreRepository.class, BookServiceImpl.class})
+@Import({JpaAuthorRepository.class, JpaBookRepository.class, JpaGenreRepository.class, BookMapper.class, BookServiceImpl.class})
 public class BookServiceTest {
 
     @Autowired
-    private BookServiceImpl bookService;
+    private BookService bookService;
 
     @Test
-    void shouldNotThrowLazyExceptionWhenFindById() {
+    void shouldFindById() {
         var optionalBook = bookService.findById(1L);
-        assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
         assertThat(optionalBook).isPresent();
-        Book book = optionalBook.get();
-        assertDoesNotThrow(() -> {
-            book.getAuthor().getFullName();
-            book.getGenres().size();
-        });
+        BookDto book = optionalBook.get();
+        assertThat(book.getId()).isEqualTo(1L);
+        assertThat(book.getAuthor()).isNotNull();
+        assertThat(book.getGenres()).isNotEmpty();
     }
 
     @Test
-    void shouldNotThrowLazyExceptionWhenFindAll() {
-        List<Book> books = bookService.findAll();
-        assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
+    void shouldFindAll() {
+        List<BookDto> books = bookService.findAll();
         assertThat(books).isNotEmpty();
-        for (Book book : books) {
-            assertDoesNotThrow(() -> {
-                book.getAuthor().getFullName();
-                book.getGenres().size();
-            });
+        for (BookDto book : books) {
+            assertThat(book.getAuthor()).isNotNull();
+            assertThat(book.getGenres()).isNotNull();
         }
     }
 
+    @Test
+    void shouldInsert() {
+        BookDto newBook = bookService.insert("New Book", 1L, Set.of(1L, 2L));
+        assertThat(newBook.getId()).isPositive();
+        assertThat(newBook.getTitle()).isEqualTo("New Book");
+        assertThat(newBook.getAuthor().getId()).isEqualTo(1L);
+        assertThat(newBook.getGenres()).hasSize(2);
+    }
+
+    @Test
+    void shouldUpdate() {
+        BookDto updated = bookService.update(1L, "Updated Title", 2L, Set.of(3L, 4L));
+        assertThat(updated.getTitle()).isEqualTo("Updated Title");
+        assertThat(updated.getAuthor().getId()).isEqualTo(2L);
+        assertThat(updated.getGenres()).hasSize(2);
+    }
 }
