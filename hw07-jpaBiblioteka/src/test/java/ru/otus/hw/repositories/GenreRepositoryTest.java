@@ -17,7 +17,7 @@ class GenreRepositoryTest {
 
     @Test
     void shouldFindAllByIds() {
-        var genres = repository.findAllByIds(Set.of(1L, 3L, 5L));
+        var genres = repository.findAllById(Set.of(1L, 3L, 5L));
         assertThat(genres).hasSize(3);
         assertThat(genres).extracting(Genre::getName).containsExactlyInAnyOrder("Genre_1", "Genre_3", "Genre_5");
     }

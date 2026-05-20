@@ -4,9 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.mappers.BookMapper;
-import ru.otus.hw.repositories.*;
 
 import java.util.List;
 import java.util.Set;
@@ -14,7 +15,8 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({BookMapper.class, BookServiceImpl.class}) // только маппер и сервис; репозитории подхватятся автоматически
+@Transactional(propagation = Propagation.NEVER)
+@Import({BookMapper.class, BookServiceImpl.class})
 public class BookServiceTest {
 
     @Autowired

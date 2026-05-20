@@ -4,16 +4,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dto.CommentDto;
 import ru.otus.hw.mappers.CommentMapper;
-import ru.otus.hw.repositories.*;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@Import({CommentMapper.class, CommentServiceImpl.class}) // только маппер и сервис
+@Transactional(propagation = Propagation.NEVER)
+@Import({CommentMapper.class, CommentServiceImpl.class})
 public class CommentServiceTest {
 
     @Autowired

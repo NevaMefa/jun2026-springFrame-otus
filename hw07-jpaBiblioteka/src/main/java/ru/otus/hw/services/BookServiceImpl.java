@@ -65,7 +65,7 @@ public class BookServiceImpl implements BookService {
     private BookDto save(long id, String title, long authorId, Set<Long> genresIds) {
         Author author = authorRepository.findById(authorId)
                 .orElseThrow(() -> new EntityNotFoundException("Author not found"));
-        List<Genre> genres = genreRepository.findAllByIds(genresIds);
+        List<Genre> genres = genreRepository.findAllById(genresIds);
         if (genres.size() != genresIds.size()) {
             throw new EntityNotFoundException("Some genres missing");
         }
