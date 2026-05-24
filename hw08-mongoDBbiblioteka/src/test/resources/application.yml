@@ -1,0 +1,20 @@
+spring:
+  shell:
+    interactive:
+      enabled: false
+  mongodb:
+    embedded:
+      version: 6.0.8
+  data:
+    mongodb:
+      host: localhost
+      port: 0
+
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 6.0.8
+
+mongock:
+  enabled: false
