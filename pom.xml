@@ -15,6 +15,6 @@
         <module>hw02-annotation-config</module>
         <module>hw03-spring-boot</module>
         <module>hw05-jdbcBiblioteka</module>
-        <module>hw06-ormBiblioteka</module>
+        <module>hw07-jpaBiblioteka</module>
     </modules>
 </project>
