@@ -16,5 +16,6 @@
         <module>hw03-spring-boot</module>
         <module>hw05-jdbcBiblioteka</module>
         <module>hw07-jpaBiblioteka</module>
+        <module>hw09-webBiblioteka</module>
     </modules>
 </project>
