@@ -13,4 +13,5 @@ public interface CommentRepository extends CrudRepository<Comment, String> {
 
     void deleteByBook(Book book);
 
+    void deleteByBookId(String bookId);
 }

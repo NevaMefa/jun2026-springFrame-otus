@@ -1,19 +1,17 @@
 package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
 import ru.otus.hw.models.Book;
+import ru.otus.hw.models.Comment;
 import ru.otus.hw.models.Genre;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
+import ru.otus.hw.repositories.CommentRepository;
 import ru.otus.hw.repositories.GenreRepository;
-
-import org.springframework.data.mongodb.core.query.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +28,7 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
-    private final MongoTemplate mongoTemplate;
+    private final CommentRepository commentRepository;
 
     @Override
     public Optional<Book> findById(String id) {
@@ -61,8 +59,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void deleteById(String id) {
-        Query query = new Query(Criteria.where("_id").is(id));
-        mongoTemplate.remove(query, Book.class);
+        List<Comment> comments = commentRepository.findByBookId(id);
+        commentRepository.deleteAll(comments);
+        bookRepository.deleteById(id);
     }
 
     private Author getAuthorById(String authorId) {
