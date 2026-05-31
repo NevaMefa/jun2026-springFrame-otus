@@ -2,20 +2,12 @@ package ru.otus.hw.services;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
-
 import lombok.RequiredArgsConstructor;
 import ru.otus.hw.exceptions.EntityNotFoundException;
 import ru.otus.hw.models.Author;
-import ru.otus.hw.models.Book;
 import ru.otus.hw.repositories.AuthorRepository;
 import ru.otus.hw.repositories.BookRepository;
 import ru.otus.hw.repositories.CommentRepository;
@@ -29,8 +21,6 @@ public class AuthorServiceImpl implements AuthorService {
 
     private final CommentRepository commentRepository;
 
-    private final MongoTemplate mongoTemplate;
-
     @Override
     public List<Author> findAll() {
         return Streamable.of(authorRepository.findAll()).toList();
@@ -43,37 +33,30 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Author insert(String fullName) {
-        var author = new Author(null, fullName);
-        return authorRepository.save(author);
+        return authorRepository.save(new Author(null, fullName));
     }
 
     @Override
     public Author update(String id, String fullName) {
-        var author = authorRepository.findById(id)
+        Author author = authorRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Author with id %s not found".formatted(id)));
         author.setFullName(fullName);
-        var updatedAuthor = authorRepository.save(author);
-
-        Query query = Query.query(Criteria.where("author.id").is(id));
-        Update update = new Update().set("author.fullName", fullName);
-        mongoTemplate.updateMulti(query, update, Book.class);
-
-        return updatedAuthor;
+        Author updated = authorRepository.save(author);
+        bookRepository.updateAuthorFullName(id, fullName);
+        return updated;
     }
 
     @Override
     public void deleteById(String id) {
-        Iterable<Book> booksIterable = bookRepository.findAll();
-        List<Book> books = StreamSupport.stream(booksIterable.spliterator(), false)
-                .filter(b -> id.equals(b.getAuthor().getId()))
-                .collect(Collectors.toList());
+        List<String> bookIds = bookRepository.findBookIdsByAuthorId(id);
 
-        if (!books.isEmpty()) {
-            for (Book book : books) {
-                commentRepository.deleteByBook(book);
+        if (!bookIds.isEmpty()) {
+            for (String bookId : bookIds) {
+                commentRepository.deleteByBookId(bookId);
             }
-            bookRepository.deleteAll(books);
         }
+
+        bookRepository.deleteByAuthorId(id);
 
         authorRepository.deleteById(id);
     }

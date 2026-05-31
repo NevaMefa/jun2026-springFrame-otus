@@ -9,13 +9,14 @@ import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.context.annotation.Import;
 import ru.otus.hw.fixtures.FixturesLoader;
 import ru.otus.hw.models.Author;
+import ru.otus.hw.repositories.BookRepositoryCustomImpl;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataMongoTest
-@Import({AuthorServiceImpl.class, FixturesLoader.class})
+@Import({AuthorServiceImpl.class, FixturesLoader.class, BookRepositoryCustomImpl.class})
 class AuthorServiceImplTest {
 
     @Autowired

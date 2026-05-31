@@ -1,7 +1,5 @@
 package ru.otus.hw.services;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +10,17 @@ import ru.otus.hw.fixtures.FixturesLoader;
 import ru.otus.hw.models.Book;
 import ru.otus.hw.models.Genre;
 import ru.otus.hw.repositories.BookRepository;
+import ru.otus.hw.repositories.BookRepositoryCustomImpl;
 import ru.otus.hw.repositories.CommentRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @DataMongoTest
 @Import({AuthorServiceImpl.class, GenreServiceImpl.class, BookServiceImpl.class,
-        CommentServiceImpl.class, FixturesLoader.class})
+        CommentServiceImpl.class, FixturesLoader.class, BookRepositoryCustomImpl.class})
 public class CascadeDeleteTest {
 
     @Autowired
@@ -70,12 +72,19 @@ public class CascadeDeleteTest {
     void shouldRemoveGenreFromBooksWhenDeletingGenre() {
         String genreId = "1";
         Book book = bookRepository.findById("1").orElseThrow();
-        assertThat(book.getGenres()).extracting(Genre::getId).contains(genreId);
+
+        List<String> genreIdsBefore = book.getGenres().stream()
+                .map(Genre::getId)
+                .collect(Collectors.toList());
+        assertThat(genreIdsBefore).contains(genreId);
 
         genreService.deleteById(genreId);
 
         Book updated = bookRepository.findById("1").orElseThrow();
-        assertThat(updated.getGenres()).extracting(Genre::getId).doesNotContain(genreId);
+        List<String> genreIdsAfter = updated.getGenres().stream()
+                .map(Genre::getId)
+                .collect(Collectors.toList());
+        assertThat(genreIdsAfter).doesNotContain(genreId);
         assertThat(genreService.findById(genreId)).isNotPresent();
     }
 }
