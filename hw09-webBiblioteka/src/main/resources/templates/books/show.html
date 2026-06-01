@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title th:text="${book.title}"></title>
+</head>
+<body>
+<section th:fragment="content">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 th:text="'Книга: ' + ${book.title}"></h1>
+        <div>
+            <a th:href="@{/books/{id}/edit(id=${book.id})}" class="btn btn-warning">✏️ Редактировать</a>
+            <a th:href="@{/books/{id}/delete(id=${book.id})}" class="btn btn-danger">🗑️ Удалить</a>
+            <a th:href="@{/books}" class="btn btn-secondary">← Назад</a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p><strong>ID:</strong> <span th:text="${book.id}"></span></p>
+            <p><strong>Название:</strong> <span th:text="${book.title}"></span></p>
+            <p><strong>Автор:</strong> <span th:text="${book.author.fullName}"></span></p>
+            <p><strong>Жанры:</strong></p>
+            <ul>
+                <li th:each="genre : ${book.genres}" th:text="${genre.name}"></li>
+                <li th:if="${book.genres.empty}">—</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">💬 Комментарии</h5>
+            <a th:href="@{/books/{id}/comments/create(id=${book.id})}" class="btn btn-sm btn-primary">+ Добавить комментарий</a>
+        </div>
+        <div class="card-body">
+            <div th:if="${comments.empty}" class="alert alert-info">
+                Нет комментариев
+            </div>
+            <table class="table table-striped" th:unless="${comments.empty}">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Текст</th>
+                    <th>Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="comment : ${comments}">
+                    <td th:text="${comment.id}"></td>
+                    <td th:text="${comment.text}"></td>
+                    <td>
+                        <a th:href="@{/comments/{id}(id=${comment.id})}" class="btn btn-sm btn-primary">Просмотр</a>
+                        <a th:href="@{/comments/{id}/edit(id=${comment.id})}" class="btn btn-sm btn-warning">✏️</a>
+                        <a th:href="@{/comments/{id}/delete(id=${comment.id})}" class="btn btn-sm btn-danger">🗑️</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+</body>
+</html>
