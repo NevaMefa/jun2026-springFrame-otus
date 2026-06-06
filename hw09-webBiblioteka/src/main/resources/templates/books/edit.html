@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout/base :: page(~{::content})}">
+<head>
+    <title>Редактировать книгу</title>
+</head>
+<body>
+<section th:fragment="content">
+    <h1>Редактировать книгу</h1>
+
+    <form th:action="@{/books/{id}(id=${book.id})}" method="post" th:method="put">
+        <div class="mb-3">
+            <label for="title" class="form-label">Название</label>
+            <input type="text" class="form-control" id="title" name="title" th:value="${book.title}" required/>
+        </div>
+        <div class="mb-3">
+            <label for="authorId" class="form-label">Автор</label>
+            <select class="form-select" id="authorId" name="authorId" required>
+                <option th:each="author : ${authors}"
+                        th:value="${author.id}"
+                        th:text="${author.fullName}"
+                        th:selected="${book.author.id == author.id}">
+                </option>
+            </select>
+        </div>
+        <div class="mb-3">
+            <label for="genreIds" class="form-label">Жанры (Ctrl+клик для выбора нескольких)</label>
+            <select class="form-select" id="genreIds" name="genreIds" multiple size="6">
+                <option th:each="genre : ${genres}"
+                        th:value="${genre.id}"
+                        th:text="${genre.name}"
+                        th:selected="${#lists.contains(book.genres.![id], genre.id)}">
+                </option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Обновить</button>
+        <a th:href="@{/books/{id}(id=${book.id})}" class="btn btn-secondary">Отмена</a>
+    </form>
+</section>
+</body>
+</html>
