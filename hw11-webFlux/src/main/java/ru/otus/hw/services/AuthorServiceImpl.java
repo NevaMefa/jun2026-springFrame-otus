@@ -26,41 +26,48 @@ public class AuthorServiceImpl implements AuthorService {
     @Override
     public Flux<AuthorDto> findAll() {
         return authorRepository.findAll()
-            .map(authorMapper::mapAuthorToDto);
+                .map(authorMapper::mapAuthorToDto);
     }
 
     @Override
     public Mono<AuthorDto> findById(String id) {
         return authorRepository.findById(id)
-            .map(authorMapper::mapAuthorToDto)
-            .switchIfEmpty(Mono.error(new EntityNotFoundException("Author with id %s not found".formatted(id))));
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("Author with id %s not found".formatted(id))))
+                .map(authorMapper::mapAuthorToDto);
     }
 
     @Override
     public Mono<AuthorDto> insert(CreateAuthorRequestDto dto) {
         var author = new Author(null, dto.fullName());
         return authorRepository.save(author)
-            .map(authorMapper::mapAuthorToDto);
+                .map(authorMapper::mapAuthorToDto);
     }
 
     @Override
     public Mono<AuthorDto> update(String id, UpdateAuthorRequestDto dto) {
         return authorRepository.findById(id)
-            .switchIfEmpty(Mono.error(new EntityNotFoundException("Author with id %s not found".formatted(id))))
-            .flatMap(author -> {
-                author.setFullName(dto.fullName());
-                return authorRepository.save(author);
-            })
-            .map(authorMapper::mapAuthorToDto);
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("Author with id %s not found".formatted(id))))
+                .flatMap(author -> {
+                    author.setFullName(dto.fullName());
+                    return authorRepository.save(author);
+                })
+                .flatMap(author ->
+                        bookRepository.updateAuthorInBooks(id, dto.fullName())
+                                .thenReturn(author)
+                )
+                .map(authorMapper::mapAuthorToDto);
     }
+
 
     @Override
     public Mono<Void> deleteById(String id) {
-        return authorRepository.findById(id)
-            .switchIfEmpty(Mono.error(new EntityNotFoundException("Author with id %s not found".formatted(id))))
-            .flatMap(author -> {
-                return bookRepository.deleteByAuthor(author)
-                    .then(authorRepository.deleteById(id));
-            });
+        return bookRepository.existsByAuthorId(id)
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new IllegalStateException(
+                                "Cannot delete author with id %s because it has associated books".formatted(id)));
+                    }
+                    return authorRepository.deleteById(id);
+                });
     }
 }

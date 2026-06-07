@@ -22,18 +22,18 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
 
     private final CommentMapper commentMapper;
-    
+
     @Override
     public Mono<CommentDto> insert(CreateCommentDto dto) {
         return bookRepository.findById(dto.bookId())
-            .switchIfEmpty(Mono.error(new EntityNotFoundException("Book with id %s not found".formatted(dto.bookId()))))
-            .flatMap(book -> {
-                Comment comment = new Comment();
-                comment.setText(dto.text());
-                comment.setBookId(book.getId());
-                return commentRepository.save(comment);
-            })
-            .map(commentMapper::mapCommentToDto);
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("Book not found with id " + dto.bookId())))
+                .flatMap(book -> {
+                    Comment comment = new Comment();
+                    comment.setBook(book);
+                    comment.setText(dto.text());
+                    return commentRepository.save(comment);
+                })
+                .map(commentMapper::mapCommentToDto);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package ru.otus.hw.models;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import lombok.AllArgsConstructor;
@@ -15,7 +16,8 @@ public class Comment {
     @Id
     private String id;
 
-    private String bookId;
+    @DBRef
+    private Book book;
 
     private String text;
 }

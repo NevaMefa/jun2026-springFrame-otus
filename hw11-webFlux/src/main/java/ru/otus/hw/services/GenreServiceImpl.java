@@ -26,41 +26,47 @@ public class GenreServiceImpl implements GenreService {
     @Override
     public Flux<GenreDto> findAll() {
         return genreRepository.findAll()
-            .map(genreMapper::mapGenreToDto);
+                .map(genreMapper::mapGenreToDto);
     }
 
     @Override
     public Mono<GenreDto> findById(String id) {
         return genreRepository.findById(id)
-            .map(genreMapper::mapGenreToDto)
-            .switchIfEmpty(Mono.error(new EntityNotFoundException("Genre with id %s not found".formatted(id))));
-    } 
-    
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("Genre with id %s not found".formatted(id))))
+                .map(genreMapper::mapGenreToDto);
+    }
+
     @Override
     public Mono<GenreDto> insert(CreateGenreRequestDto dto) {
         var genre = new Genre(null, dto.name());
         return genreRepository.save(genre)
-            .map(genreMapper::mapGenreToDto);
+                .map(genreMapper::mapGenreToDto);
     }
 
     @Override
     public Mono<GenreDto> update(String id, UpdateGenreRequestDto dto) {
         return genreRepository.findById(id)
-            .switchIfEmpty(Mono.error(new EntityNotFoundException("Genre with id %s not found".formatted(id))))
-            .flatMap(genre -> {
-                genre.setName(dto.name());
-                return genreRepository.save(genre);
-            })
-            .map(genreMapper::mapGenreToDto);
-    }    
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("Genre with id %s not found".formatted(id))))
+                .flatMap(genre -> {
+                    genre.setName(dto.name());
+                    return genreRepository.save(genre);
+                })
+                .flatMap(genre ->
+                        bookRepository.updateGenreInBooks(id, dto.name())
+                                .thenReturn(genre)
+                )
+                .map(genreMapper::mapGenreToDto);
+    }
 
     @Override
     public Mono<Void> deleteById(String id) {
-        return bookRepository.findBooksByGenreId(id)
-            .flatMap(book -> {
-                book.getGenres().removeIf(genre -> genre.getId().equals(id));
-                return bookRepository.save(book);
-            })
-            .then(genreRepository.deleteById(id));
+        return bookRepository.existsByGenreId(id)
+                .flatMap(exists -> {
+                    if (exists) {
+                        return Mono.error(new IllegalStateException(
+                                "Cannot delete genre with id %s because it has associated books".formatted(id)));
+                    }
+                    return genreRepository.deleteById(id);
+                });
     }
 }
