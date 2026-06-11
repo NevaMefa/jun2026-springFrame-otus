@@ -27,9 +27,21 @@ public class CommentServiceImpl implements CommentService {
     public Mono<CommentDto> insert(CreateCommentDto dto) {
         return bookRepository.findById(dto.bookId())
                 .switchIfEmpty(Mono.error(new EntityNotFoundException("Book not found with id " + dto.bookId())))
-                .flatMap(book -> {
+                .map(book -> {
                     Comment comment = new Comment();
-                    comment.setBook(book);
+                    comment.setText(dto.text());
+                    comment.setBookId(book.getId());
+                    return comment;
+                })
+                .flatMap(commentRepository::save)
+                .map(commentMapper::mapCommentToDto);
+    }
+
+    @Override
+    public Mono<CommentDto> update(UpdateCommentDto dto) {
+        return commentRepository.findById(dto.id())
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("Comment with id %s not found".formatted(dto.id()))))
+                .flatMap(comment -> {
                     comment.setText(dto.text());
                     return commentRepository.save(comment);
                 })
@@ -37,31 +49,20 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public Mono<CommentDto> update(UpdateCommentDto dto) {
-        return commentRepository.findById(dto.id())
-            .switchIfEmpty(Mono.error(new EntityNotFoundException("Comment with id %s not found".formatted(dto.id()))))
-            .flatMap(comment -> {
-                comment.setText(dto.text());
-                return commentRepository.save(comment);
-            })
-            .map(commentMapper::mapCommentToDto);
-    }
-
-    @Override
     public Flux<CommentDto> findByBookId(String bookId) {
         return commentRepository.findByBookId(bookId)
-            .map(commentMapper::mapCommentToDto);
+                .map(commentMapper::mapCommentToDto);
     }
 
     @Override
     public Mono<CommentDto> findById(String id) {
         return commentRepository.findById(id)
-            .switchIfEmpty(Mono.error(new EntityNotFoundException("Comment with id %s not found".formatted(id))))
-            .map(commentMapper::mapCommentToDto);
+                .switchIfEmpty(Mono.error(new EntityNotFoundException("Comment with id %s not found".formatted(id))))
+                .map(commentMapper::mapCommentToDto);
     }
 
     @Override
     public Mono<Void> deleteById(String id) {
         return commentRepository.deleteById(id);
-    } 
+    }
 }

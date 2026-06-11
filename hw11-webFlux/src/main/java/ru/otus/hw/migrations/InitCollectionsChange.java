@@ -98,23 +98,13 @@ public class InitCollectionsChange {
     }
 
     private Mono<Void> insertComments() {
-        return Mono.zip(
-                mongoTemplate.findById("1", Book.class),
-                mongoTemplate.findById("2", Book.class),
-                mongoTemplate.findById("3", Book.class)
-        ).flatMap(tuple -> {
-            Book book1 = tuple.getT1();
-            Book book2 = tuple.getT2();
-            Book book3 = tuple.getT3();
-
-            List<Comment> comments = List.of(
-                    new Comment("1", book1, "Comment_1"),
-                    new Comment("2", book1, "Comment_2"),
-                    new Comment("3", book2, "Comment_3"),
-                    new Comment("4", book3, "Comment_4")
-            );
-            return mongoTemplate.insertAll(comments).then();
-        });
+        List<Comment> comments = List.of(
+                new Comment("1", "Comment_1", "1"),
+                new Comment("2", "Comment_2", "1"),
+                new Comment("3", "Comment_3", "2"),
+                new Comment("4", "Comment_4", "3")
+        );
+        return mongoTemplate.insertAll(comments).then();
     }
 
     @RollbackExecution
