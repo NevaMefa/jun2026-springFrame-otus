@@ -16,5 +16,13 @@ public class Comment {
 
     private String text;
 
-    private String bookId;
+    private BookInfo book;
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class BookInfo {
+        private String id;
+        private String title;
+    }
 }

@@ -99,10 +99,10 @@ public class InitCollectionsChange {
 
     private Mono<Void> insertComments() {
         List<Comment> comments = List.of(
-                new Comment("1", "Comment_1", "1"),
-                new Comment("2", "Comment_2", "1"),
-                new Comment("3", "Comment_3", "2"),
-                new Comment("4", "Comment_4", "3")
+                new Comment("1", "Comment_1", new Comment.BookInfo("1", "BookTitle_1")),
+                new Comment("2", "Comment_2", new Comment.BookInfo("1", "BookTitle_1")),
+                new Comment("3", "Comment_3", new Comment.BookInfo("2", "BookTitle_2")),
+                new Comment("4", "Comment_4", new Comment.BookInfo("3", "BookTitle_3"))
         );
         return mongoTemplate.insertAll(comments).then();
     }

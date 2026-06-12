@@ -14,7 +14,8 @@ public class CommentMapper {
         return new CommentDto(
                 comment.getId(),
                 comment.getText(),
-                comment.getBookId()
+                comment.getBook().getId(),
+                comment.getBook().getTitle()
         );
     }
 }

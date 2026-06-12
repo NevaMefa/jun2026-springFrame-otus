@@ -30,7 +30,7 @@ public class CommentServiceImpl implements CommentService {
                 .map(book -> {
                     Comment comment = new Comment();
                     comment.setText(dto.text());
-                    comment.setBookId(book.getId());
+                    comment.setBook(new Comment.BookInfo(book.getId(), book.getTitle()));
                     return comment;
                 })
                 .flatMap(commentRepository::save)

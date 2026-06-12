@@ -189,14 +189,14 @@ class CommentRestControllerTest {
     private static List<CommentDto> getDbCommentDtosByBookId(String bookId) {
         return switch (bookId) {
             case "1" -> List.of(
-                new CommentDto("1", "Comment_1", "1"),
-                new CommentDto("2", "Comment_2", "1")
+                new CommentDto("1", "Comment_1", "1", "BookTitle_1"),
+                new CommentDto("2", "Comment_2", "1", "BookTitle_1")
             );
             case "2" -> List.of(
-                new CommentDto("3", "Comment_3", "2")
+                new CommentDto("3", "Comment_3", "2", "BookTitle_2")
             );
             case "3" -> List.of(
-                new CommentDto("4", "Comment_4", "3")
+                new CommentDto("4", "Comment_4", "3", "BookTitle_3")
             );
             default -> List.of();
         };
@@ -204,10 +204,10 @@ class CommentRestControllerTest {
 
     private static List<CommentDto> getDbCommentDtos() {
         return List.of(
-            new CommentDto("1", "Comment_1", "1"),
-            new CommentDto("2", "Comment_2", "1"),
-            new CommentDto("3", "Comment_3", "2"),
-            new CommentDto("4", "Comment_4", "3")
+            new CommentDto("1", "Comment_1", "1", "BookTitle_1"),
+            new CommentDto("2", "Comment_2", "1", "BookTitle_1"),
+            new CommentDto("3", "Comment_3", "2", "BookTitle_2"),
+            new CommentDto("4", "Comment_4", "3", "BookTitle_3")
         );
     }
 
@@ -215,15 +215,15 @@ class CommentRestControllerTest {
         return Stream.of(
             Arguments.of(
                 new CreateCommentDto("Comment_1.1", "1"),
-                new CommentDto("10", "Comment_1.1", "1")
+                new CommentDto("10", "Comment_1.1", "1", "BookTitle_1")
             ),
             Arguments.of(
                 new CreateCommentDto("Comment_2.1", "2"),
-                new CommentDto("11", "Comment_2.1", "2")
+                new CommentDto("11", "Comment_2.1", "2", "BookTitle_2")
             ),
             Arguments.of(
                 new CreateCommentDto("Comment_3.1", "3"),
-                new CommentDto("12", "Comment_3.1", "3")
+                new CommentDto("12", "Comment_3.1", "3", "BookTitle_3")
             )
         );
     }
@@ -233,17 +233,17 @@ class CommentRestControllerTest {
             Arguments.of(
                 new UpdateCommentRequestDto("Comment_1.2"),
                 "1",
-                new CommentDto("1", "Comment_1.2", "1")
+                new CommentDto("1", "Comment_1.2", "1", "BookTitle_1")
             ),
             Arguments.of(
                 new UpdateCommentRequestDto("Comment_2.2"),
                 "2",
-                new CommentDto("2", "Comment_2.2", "1")
+                new CommentDto("2", "Comment_2.2", "1", "BookTitle_1")
             ),
             Arguments.of(
                 new UpdateCommentRequestDto("Comment_2.2"),
                 "3",
-                new CommentDto("3", "Comment_2.2", "2")
+                new CommentDto("3", "Comment_2.2", "2", "BookTitle_2")
             )
         );
     }
