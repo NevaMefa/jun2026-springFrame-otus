@@ -6,7 +6,7 @@ spring:
       database: library_db
 
 server:
-  port: 8040
+  port: 8041
 
 logging:
   level:

@@ -81,11 +81,17 @@ public class BookServiceImpl implements BookService {
                     Author author = tuple.getT2();
                     List<Genre> genres = tuple.getT3();
 
+                    String oldTitle = book.getTitle();
                     book.setTitle(dto.title());
                     book.setAuthor(author);
                     book.setGenres(genres);
 
-                    return bookRepository.save(book);
+                    Mono<Void> updateComments = Mono.empty();
+                    if (!oldTitle.equals(dto.title())) {
+                        updateComments = commentRepository.updateBookTitleInComments(id, dto.title());
+                    }
+
+                    return updateComments.then(bookRepository.save(book));
                 })
                 .map(bookMapper::mapBookToDto);
     }
