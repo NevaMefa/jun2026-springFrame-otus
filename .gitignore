@@ -24,6 +24,7 @@ buildNumber.properties
 *.ipr
 out/
 .idea_modules/
+.DS_Store
 
 # NetBeans
 nbproject/private/
@@ -55,3 +56,35 @@ logs/
 
 # Test reports
 test-output/
+
+# Frontend build artifacts
+src/main/resources/static/assets/
+src/main/resources/static/*.js
+src/main/resources/static/*.js.map
+src/main/resources/static/index.html
+
+# Node modules
+frontend/node_modules/
+node_modules/
+
+# Node modules
+**/node_modules/
+**/node_modules/**/*
+
+# Frontend build
+**/src/main/resources/static/assets/
+**/src/main/resources/static/*.js
+**/src/main/resources/static/*.js.map
+**/src/main/resources/static/index.html
+
+# IDE
+.idea/
+*.iml
+.DS_Store
+
+# Cookies
+cookies.txt
+
+# Build
+target/
+**/target/
