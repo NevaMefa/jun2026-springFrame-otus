@@ -1,0 +1,13 @@
+services:
+  mongo:
+    image: mongo:6.0
+    container_name: hw11-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:
+    driver: local
