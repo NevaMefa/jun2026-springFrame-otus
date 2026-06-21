@@ -12,7 +12,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
-import ru.otus.hw.config.TestSecurityConfig;
+import ru.otus.hw.config.SecurityConfig;
 import ru.otus.hw.dto.AuthorDto;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.CommentDto;
@@ -33,7 +33,6 @@ import ru.otus.hw.services.GenreService;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -48,7 +47,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
         GenreRestController.class,
         CommentRestController.class
 })
-@Import(TestSecurityConfig.class)
+@Import(SecurityConfig.class)
 class SecurityParameterizedTest {
 
     @Autowired
