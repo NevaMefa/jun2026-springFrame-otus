@@ -18,6 +18,6 @@
         <module>hw07-jpaBiblioteka</module>
         <module>hw09-webBiblioteka</module>
         <module>hw10-webAJAX</module>
-        <module>hw11-webFlux</module>
+        <module>hw12-webAuth</module>
     </modules>
 </project>
