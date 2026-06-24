@@ -19,5 +19,6 @@
         <module>hw09-webBiblioteka</module>
         <module>hw10-webAJAX</module>
         <module>hw12-webAuth</module>
+        <module>hw13-webRole</module>
     </modules>
 </project>
