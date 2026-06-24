@@ -1,0 +1,30 @@
+# Compiled
+target/
+*.class
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+.DS_Store
+
+# Logs
+*.log
+
+# Frontend
+frontend/node_modules/
+frontend/.package-lock.json
+frontend/package-lock.json
+frontend/dist/
+frontend/.vite/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Application
+*.pid
+frontend/package-lock.json
