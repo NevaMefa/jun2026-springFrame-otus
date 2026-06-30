@@ -1,6 +1,7 @@
 package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dto.CommentDto;
@@ -42,6 +43,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     @Transactional
     public CommentDto insert(CreateCommentDto dto) {
         Book book = bookRepository.findById(dto.bookId())
@@ -52,6 +54,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public CommentDto update(UpdateCommentDto dto) {
         Comment comment = commentRepository.findById(dto.id())
@@ -62,6 +65,7 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void deleteById(long id) {
         commentRepository.deleteById(id);

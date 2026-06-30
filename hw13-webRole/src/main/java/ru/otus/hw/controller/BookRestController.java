@@ -3,7 +3,6 @@ package ru.otus.hw.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,7 +46,6 @@ public class BookRestController {
 
     @DeleteMapping("/api/v1/book/{bookId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
     public void deleteBook(@PathVariable Long bookId) {
         if (!permissionService.canDeleteBook(bookId)) {
             throw new EntityNotFoundException("Book not found with id: " + bookId);
@@ -57,14 +55,12 @@ public class BookRestController {
 
     @PostMapping("/api/v1/book")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
     public CreatedEntityDto createBook(@RequestBody @Valid CreateBookRequestDto requestDto) {
         BookDto book = bookService.insert(requestDto);
         return new CreatedEntityDto(book.getId());
     }
 
     @PutMapping("/api/v1/book/{bookId}")
-    @PreAuthorize("hasRole('ADMIN')")
     public BookDto updateBook(
             @PathVariable Long bookId,
             @RequestBody @Valid UpdateBookRequestDto requestDto) {

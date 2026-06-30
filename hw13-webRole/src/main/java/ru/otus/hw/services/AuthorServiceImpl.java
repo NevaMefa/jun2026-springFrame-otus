@@ -1,6 +1,7 @@
 package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dto.AuthorDto;
@@ -38,6 +39,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public AuthorDto insert(CreateAuthorRequestDto requestDto) {
         Author author = new Author(0, requestDto.fullName());
@@ -46,6 +48,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public AuthorDto update(long id, UpdateAuthorRequestDto requestDto) {
         Author author = authorRepository.findById(id)
@@ -56,6 +59,7 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void deleteById(long id) {
         authorRepository.deleteById(id);

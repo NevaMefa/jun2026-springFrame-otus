@@ -3,7 +3,6 @@ package ru.otus.hw.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,21 +40,18 @@ public class AuthorRestController {
 
     @DeleteMapping("/api/v1/author/{authorId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
     public void deleteAuthor(@PathVariable Long authorId) {
         authorService.deleteById(authorId);
     }
 
     @PostMapping("/api/v1/author")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('ADMIN')")
     public CreatedEntityDto createAuthor(@RequestBody @Valid CreateAuthorRequestDto requestDto) {
         AuthorDto author = authorService.insert(requestDto);
         return new CreatedEntityDto(author.getId());
     }
 
     @PutMapping("/api/v1/author/{authorId}")
-    @PreAuthorize("hasRole('ADMIN')")
     public AuthorDto updateAuthor(@PathVariable Long authorId, @RequestBody @Valid UpdateAuthorRequestDto requestDto) {
         return authorService.update(authorId, requestDto);
     }

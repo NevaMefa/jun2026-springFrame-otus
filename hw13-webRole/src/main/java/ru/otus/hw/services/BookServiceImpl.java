@@ -1,6 +1,7 @@
 package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dto.BookDto;
@@ -47,18 +48,21 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public BookDto insert(CreateBookRequestDto requestDto) {
         return save(0, requestDto.title(), requestDto.authorId(), requestDto.genreIds());
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public BookDto update(long id, UpdateBookRequestDto requestDto) {
         return save(id, requestDto.title(), requestDto.authorId(), requestDto.genreIds());
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void deleteById(long id) {
         bookRepository.deleteById(id);

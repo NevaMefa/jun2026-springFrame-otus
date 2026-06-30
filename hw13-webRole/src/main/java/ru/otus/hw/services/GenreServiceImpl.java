@@ -1,6 +1,7 @@
 package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dto.CreateGenreRequestDto;
@@ -38,6 +39,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public GenreDto insert(CreateGenreRequestDto requestDto) {
         Genre genre = new Genre(0, requestDto.name());
@@ -46,6 +48,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public GenreDto update(long id, UpdateGenreRequestDto requestDto) {
         Genre genre = genreRepository.findById(id)
@@ -56,6 +59,7 @@ public class GenreServiceImpl implements GenreService {
     }
 
     @Override
+    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void deleteById(long id) {
         genreRepository.deleteById(id);

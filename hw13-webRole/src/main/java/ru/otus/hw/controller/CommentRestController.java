@@ -3,7 +3,6 @@ package ru.otus.hw.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,20 +41,17 @@ public class CommentRestController {
 
     @DeleteMapping("/api/v1/comment/{commentId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @PreAuthorize("hasRole('ADMIN')")
     public void deleteComment(@PathVariable Long commentId) {
         commentService.deleteById(commentId);
     }
 
     @PostMapping("/api/v1/comment")
     @ResponseStatus(HttpStatus.CREATED)
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public CommentDto createComment(@RequestBody @Valid CreateCommentDto requestDto) {
         return commentService.insert(requestDto);
     }
 
     @PutMapping("/api/v1/comment/{commentId}")
-    @PreAuthorize("hasRole('ADMIN')")
     public CommentDto updateComment(
             @PathVariable Long commentId,
             @RequestBody @Valid UpdateCommentRequestDto requestDto) {
