@@ -19,7 +19,6 @@ import ru.otus.hw.dto.CreateBookRequestDto;
 import ru.otus.hw.dto.CreatedEntityDto;
 import ru.otus.hw.dto.UpdateBookRequestDto;
 import ru.otus.hw.exceptions.EntityNotFoundException;
-import ru.otus.hw.services.BookPermissionService;
 import ru.otus.hw.services.BookService;
 
 @RestController
@@ -28,8 +27,6 @@ public class BookRestController {
 
     private final BookService bookService;
 
-    private final BookPermissionService permissionService;
-
     @GetMapping({"/api/v1/book"})
     public List<BookDto> listAllBooks() {
         return bookService.findAll();
@@ -37,9 +34,6 @@ public class BookRestController {
 
     @GetMapping("/api/v1/book/{bookId}")
     public BookDto getBookById(@PathVariable Long bookId) {
-        if (!permissionService.canReadBook(bookId)) {
-            throw new EntityNotFoundException("Book not found with id: " + bookId);
-        }
         return bookService.findById(bookId)
                 .orElseThrow(() -> new EntityNotFoundException("Book not found with id: " + bookId));
     }
@@ -47,9 +41,6 @@ public class BookRestController {
     @DeleteMapping("/api/v1/book/{bookId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteBook(@PathVariable Long bookId) {
-        if (!permissionService.canDeleteBook(bookId)) {
-            throw new EntityNotFoundException("Book not found with id: " + bookId);
-        }
         bookService.deleteById(bookId);
     }
 
@@ -64,9 +55,6 @@ public class BookRestController {
     public BookDto updateBook(
             @PathVariable Long bookId,
             @RequestBody @Valid UpdateBookRequestDto requestDto) {
-        if (!permissionService.canEditBook(bookId)) {
-            throw new EntityNotFoundException("Book not found with id: " + bookId);
-        }
         return bookService.update(bookId, requestDto);
     }
 }

@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import ru.otus.hw.models.Book;
 import ru.otus.hw.repositories.BookRepository;
+
 
 @Service
 @RequiredArgsConstructor
@@ -13,29 +15,25 @@ public class BookPermissionService {
     private final BookRepository bookRepository;
 
     public boolean canReadBook(Long bookId) {
-        if (!bookRepository.existsById(bookId)) {
-            return false;
-        }
-        return hasPermission("READ");
+        return hasPermission(bookId, "READ");
     }
 
     public boolean canEditBook(Long bookId) {
-        if (!bookRepository.existsById(bookId)) {
-            return false;
-        }
-        return hasPermission("WRITE");
+        return hasPermission(bookId, "WRITE");
     }
 
     public boolean canDeleteBook(Long bookId) {
-        if (!bookRepository.existsById(bookId)) {
-            return false;
-        }
-        return hasPermission("DELETE");
+        return hasPermission(bookId, "DELETE");
     }
 
-    private boolean hasPermission(String permission) {
+    private boolean hasPermission(Long bookId, String permission) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth == null || !auth.isAuthenticated()) {
+            return false;
+        }
+
+        Book book = bookRepository.findById(bookId).orElse(null);
+        if (book == null) {
             return false;
         }
 

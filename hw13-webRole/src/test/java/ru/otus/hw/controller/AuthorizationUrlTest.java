@@ -8,7 +8,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.otus.hw.config.MethodSecurityConfig;
 import ru.otus.hw.config.SecurityConfig;
 import ru.otus.hw.dto.BookDto;
 import ru.otus.hw.dto.CreateBookRequestDto;
@@ -24,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookRestController.class)
-@Import({SecurityConfig.class, MethodSecurityConfig.class})
+@Import(SecurityConfig.class)
 class AuthorizationUrlTest {
 
     @Autowired
@@ -38,7 +37,6 @@ class AuthorizationUrlTest {
 
     @MockitoBean
     private CustomUserDetailsService customUserDetailsService;
-
 
     @Test
     @WithMockUser(roles = "USER")
@@ -98,7 +96,6 @@ class AuthorizationUrlTest {
                 .andExpect(status().isForbidden());
     }
 
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void adminCanReadBooks() throws Exception {
@@ -111,7 +108,7 @@ class AuthorizationUrlTest {
     void adminCanCreateBook() throws Exception {
         BookDto book = new BookDto();
         book.setId(10L);
-        when(bookService.insert(any(CreateBookRequestDto.class))).thenReturn(book);  // ← Исправлено
+        when(bookService.insert(any(CreateBookRequestDto.class))).thenReturn(book);
 
         String bookJson = """
                 {

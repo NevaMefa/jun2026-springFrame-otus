@@ -1,7 +1,6 @@
 package ru.otus.hw.services;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.otus.hw.dto.BookDto;
@@ -33,9 +32,14 @@ public class BookServiceImpl implements BookService {
 
     private final BookMapper bookMapper;
 
+    private final BookPermissionService permissionService;
+
     @Override
     @Transactional(readOnly = true)
     public Optional<BookDto> findById(long id) {
+        if (!permissionService.canReadBook(id)) {
+            throw new EntityNotFoundException("Book not found with id: " + id);
+        }
         return bookRepository.findById(id).map(bookMapper::toDto);
     }
 
@@ -48,23 +52,26 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public BookDto insert(CreateBookRequestDto requestDto) {
         return save(0, requestDto.title(), requestDto.authorId(), requestDto.genreIds());
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public BookDto update(long id, UpdateBookRequestDto requestDto) {
+        if (!permissionService.canEditBook(id)) {
+            throw new EntityNotFoundException("Book not found with id: " + id);
+        }
         return save(id, requestDto.title(), requestDto.authorId(), requestDto.genreIds());
     }
 
     @Override
-    @PreAuthorize("hasRole('ADMIN')")
     @Transactional
     public void deleteById(long id) {
+        if (!permissionService.canDeleteBook(id)) {
+            throw new EntityNotFoundException("Book not found with id: " + id);
+        }
         bookRepository.deleteById(id);
     }
 
